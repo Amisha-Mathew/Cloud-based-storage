@@ -81,12 +81,17 @@ public class Model {
         this.password = password;
     }
 
-    public Model(Integer userId, int numFiles, File filename)
+    public Model(Integer userId, int numFiles, int numFiles2, File filename)
     {
         this.userId = userId;
         this.numFiles = numFiles;
         this.filename = filename;
     }
+
+    public Model(int id, Integer userId2, int numFiles2, String originalFilename, byte[] fileContent) {
+    }
+
+
 
     public Integer getUserID()
     {
