@@ -1,12 +1,11 @@
 package com.example.demo;
 
-import java.io.File;
 
 public class Model {
     
     private Integer userId;
     private int numFiles;
-    private File filename;
+    private byte[] filename;
     private String userName;
     private String firstName;
     private String lastName;
@@ -81,11 +80,11 @@ public class Model {
         this.password = password;
     }
 
-    public Model(Integer userId, int numFiles, int numFiles2, File filename)
+    public Model(Integer userId, int numFiles, String string, byte[] fileContent)
     {
         this.userId = userId;
         this.numFiles = numFiles;
-        this.filename = filename;
+        this.filename = fileContent;
     }
 
     public Model(int id, Integer userId2, int numFiles2, String originalFilename, byte[] fileContent) {
@@ -113,12 +112,12 @@ public class Model {
         this.numFiles = numFiles;
     }
 
-    public File getFile()
+    public byte[] getFile()
     {
         return filename;
     }
 
-    public void setFile(File filename)
+    public void setFile(byte[] filename)
     {
         this.filename = filename;
     }

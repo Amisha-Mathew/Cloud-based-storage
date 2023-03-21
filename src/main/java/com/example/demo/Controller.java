@@ -42,52 +42,64 @@ public class Controller {
         return new ResponseEntity<>(model, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{userId}/files")
-    public ResponseEntity<List<Model>> getUserFiles(@PathVariable Integer userId) {
-        List<Model> files = new ArrayList<>();
-        for (Model Model : userFilesList) {
-            if (Model.getUserID().equals(userId)) {
-                files.add(Model);
-            }
-        }
-        return new ResponseEntity<>(files, HttpStatus.OK);
-    }
-
     @GetMapping("/{userId}/files/{fileId}")
-    public ResponseEntity<Model> getUserFileById(@PathVariable Integer userId, @PathVariable Integer fileId) {
-        for (Model Model : userFilesList) {
-            if (Model.getUserID().equals(userId) && Model.getNumFiles().equals(fileId)) {
-                return new ResponseEntity<>(Model, HttpStatus.OK);
-            }
+    // Generate get request
+    // curl -X GET http://localhost:8080/users/1/files/1
+    public ResponseEntity<Model> getUserFileById(@PathVariable Integer userId, @PathVariable Integer fileId)
+            throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM user_files WHERE user_id = ? AND num_files = ?");
+        statement.setInt(1, userId);
+        statement.setInt(2, fileId);
+        ResultSet rs = statement.executeQuery();
+        if (rs.next()) {
+            int id = rs.getInt("id");
+            int numFiles = rs.getInt("num_files");
+            String filename = rs.getString("filename");
+            byte[] fileContent = rs.getBytes("file_content");
+            statement.close();
+            Model model = new Model(id, userId, numFiles, filename, fileContent);
+            return new ResponseEntity<>(model, HttpStatus.OK);
+        } else {
+            statement.close();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-
+    // curl -X PUT -F "numFiles=2" -F "file=@/home/ala/Desktop/1.jpg" http://localhost:8080/users/1/files/1
     @PutMapping("/{userId}/files/{fileId}")
+    // Generate put request
     public ResponseEntity<Model> updateUserFileById(@PathVariable Integer userId, @PathVariable Integer fileId,
-            @RequestParam("numFiles") int numFiles, @RequestParam("filename") File filename) {
-        for (Model Model : userFilesList) {
-            if (Model.getUserID().equals(userId) && Model.getNumFiles().equals(fileId)) {
-                Model.setNumFiles(numFiles);
-                Model.setFile(filename);
-                return new ResponseEntity<>(Model, HttpStatus.OK);
-            }
+            @RequestParam("numFiles") int numFiles, @RequestParam("file") MultipartFile file) throws SQLException, IOException {
+        byte[] fileContent = file.getBytes();
+        PreparedStatement statement = connection.prepareStatement(
+                "UPDATE user_files SET num_files = ?, filename = ?, file_content = ? WHERE user_id = ? AND num_files = ?");
+        statement.setInt(1, numFiles);
+        statement.setString(2, file.getOriginalFilename());
+        statement.setBytes(3, fileContent);
+        statement.setInt(4, userId);
+        statement.setInt(5, fileId);
+        int rowsUpdated = statement.executeUpdate();
+        statement.close();
+        if (rowsUpdated > 0) {
+            Model model = new Model(userId, numFiles, file.getOriginalFilename(), fileContent);
+            return new ResponseEntity<>(model, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+    
 
     @DeleteMapping("/{userId}/files/{fileId}")
-    public ResponseEntity<Void> deleteUserFileById(@PathVariable Integer userId, @PathVariable Integer fileId) {
-        Model userFileToRemove = null;
-        for (Model Model : userFilesList) {
-            if (Model.getUserID().equals(userId) && Model.getNumFiles().equals(fileId)) {
-                userFileToRemove = Model;
-                break;
-            }
-        }
-        if (userFileToRemove != null) {
-            userFilesList.remove(userFileToRemove);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    // Generate delete request
+    // curl -X DELETE http://localhost:8080/users/1/files/1
+    public ResponseEntity<Model> deleteUserFileById(@PathVariable int userId, @PathVariable int fileId)
+            throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("DELETE FROM user_files WHERE user_id = ? AND num_files = ?");
+        statement.setInt(1, userId);
+        statement.setInt(2, fileId);
+        int rowsDeleted = statement.executeUpdate();
+        statement.close();
+        if (rowsDeleted > 0) {
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
