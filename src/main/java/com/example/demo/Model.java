@@ -13,17 +13,25 @@ public class Model {
     private String password;
     //private String mobNumber;
 
-    public Model(Integer userId, String userName, String firstName, String lastName, String email, String password)
-    {
-        this.email = email;
-        this.userId = userId;
-        this.userName = userName;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.password = password;
-    }
+    // parameterized constructor
+    // public Model(Integer userId, String userName, String firstName, String lastName, String email, String password)
+    // {
+    //     this.userId = userId;
+    //     this.userName = userName;
+    //     this.firstName = firstName;
+    //     this.lastName = lastName;
+    //     this.email = email;
+    //     this.password = password;
+    // }
 
    
+
+    public Model(Integer userId2, int numFiles2, String originalFilename, byte[] fileContent) {
+        this.userId=userId2;
+        this.numFiles=numFiles2;
+        this.filename=fileContent;
+        
+    }
 
     public void setUserID(Integer userId)
     {
@@ -80,15 +88,9 @@ public class Model {
         this.password = password;
     }
 
-    public Model(Integer userId, int numFiles, String string, byte[] fileContent)
-    {
-        this.userId = userId;
-        this.numFiles = numFiles;
-        this.filename = fileContent;
-    }
+    
 
-    public Model(int id, Integer userId2, int numFiles2, String originalFilename, byte[] fileContent) {
-    }
+    
 
 
 

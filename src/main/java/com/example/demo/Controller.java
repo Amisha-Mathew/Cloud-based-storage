@@ -4,6 +4,8 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,29 +44,28 @@ public class Controller {
         return new ResponseEntity<>(model, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{userId}/files/{fileId}")
-    // Generate get request
-    // curl -X GET http://localhost:8080/users/1/files/1
-    public ResponseEntity<Model> getUserFileById(@PathVariable Integer userId, @PathVariable Integer fileId)
-            throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM user_files WHERE user_id = ? AND num_files = ?");
-        statement.setInt(1, userId);
-        statement.setInt(2, fileId);
+    @GetMapping("/files")
+    // Get all files
+    // curl -X GET http://localhost:8080/users/files
+    public ResponseEntity<List<Model>> getAllUserFiles() throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM user_files");
         ResultSet rs = statement.executeQuery();
-        if (rs.next()) {
+        List<Model> userFilesList = new ArrayList<>();
+        while (rs.next()) {
             int id = rs.getInt("id");
+            int userId = rs.getInt("user_id");
             int numFiles = rs.getInt("num_files");
             String filename = rs.getString("filename");
             byte[] fileContent = rs.getBytes("file_content");
-            statement.close();
-            Model model = new Model(id, userId, numFiles, filename, fileContent);
-            return new ResponseEntity<>(model, HttpStatus.OK);
-        } else {
-            statement.close();
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            System.out.println("id: " + id + " userId: " + userId + " numFiles: " + numFiles + " filename: " + filename);
+            // Add it to userFilesList 
+            userFilesList.addAll(id,userId,numFiles,filename,String(fileContent));
         }
+        statement.close();
+        return new ResponseEntity<>(userFilesList, HttpStatus.OK);
     }
-    // curl -X PUT -F "numFiles=2" -F "file=@/home/ala/Desktop/1.jpg" http://localhost:8080/users/1/files/1
+   
+
     @PutMapping("/{userId}/files/{fileId}")
     // Generate put request
     public ResponseEntity<Model> updateUserFileById(@PathVariable Integer userId, @PathVariable Integer fileId,
