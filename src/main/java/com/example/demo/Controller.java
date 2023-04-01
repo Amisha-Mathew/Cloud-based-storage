@@ -3,10 +3,6 @@ package com.example.demo;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +21,7 @@ public class Controller {
     private List<Model> userFilesList = new ArrayList<>();
 
     @PostMapping("/{userId}/files")
+    
     public ResponseEntity<Model> addUserFile(@PathVariable Integer userId, @RequestParam("numFiles") int numFiles,
             @RequestParam("file") MultipartFile file) throws SQLException, IOException {
         byte[] fileContent = file.getBytes();
@@ -57,9 +54,8 @@ public class Controller {
             int numFiles = rs.getInt("num_files");
             String filename = rs.getString("filename");
             byte[] fileContent = rs.getBytes("file_content");
-            System.out.println("id: " + id + " userId: " + userId + " numFiles: " + numFiles + " filename: " + filename);
-            // Add it to userFilesList 
-            userFilesList.addAll(id,userId,numFiles,filename,String(fileContent));
+            Model model = new Model(id, userId, numFiles, filename, fileContent);
+            userFilesList.add(model);
         }
         statement.close();
         return new ResponseEntity<>(userFilesList, HttpStatus.OK);
@@ -81,7 +77,7 @@ public class Controller {
         int rowsUpdated = statement.executeUpdate();
         statement.close();
         if (rowsUpdated > 0) {
-            Model model = new Model(userId, numFiles, file.getOriginalFilename(), fileContent);
+            Model model = new Model(userId, numFiles, rowsUpdated, file.getOriginalFilename(), fileContent);
             return new ResponseEntity<>(model, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -105,4 +101,5 @@ public class Controller {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+    
 }

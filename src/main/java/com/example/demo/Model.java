@@ -11,26 +11,17 @@ public class Model {
     private String lastName;
     private String email;
     private String password;
-    //private String mobNumber;
-
-    // parameterized constructor
-    // public Model(Integer userId, String userName, String firstName, String lastName, String email, String password)
-    // {
-    //     this.userId = userId;
-    //     this.userName = userName;
-    //     this.firstName = firstName;
-    //     this.lastName = lastName;
-    //     this.email = email;
-    //     this.password = password;
-    // }
+  
 
    
 
-    public Model(Integer userId2, int numFiles2, String originalFilename, byte[] fileContent) {
-        this.userId=userId2;
-        this.numFiles=numFiles2;
-        this.filename=fileContent;
-        
+    
+
+    public Model(int id, int userId2, int numFiles2, String filename2, byte[] fileContent) {
+        this.userId = userId2;
+        this.numFiles = numFiles2;
+        this.filename = fileContent;
+        this.userName = filename2;
     }
 
     public void setUserID(Integer userId)
