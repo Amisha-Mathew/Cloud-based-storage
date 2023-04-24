@@ -17,7 +17,7 @@ public class Model {
 
     
 
-    public Model(int id, int userId2, String filename2, byte[] fileContent) {
+    public Model(int userId2, String filename2, byte[] fileContent) {
         this.userId = userId2;
         this.filename = fileContent;
         this.userName = filename2;
@@ -89,10 +89,7 @@ public class Model {
         return userId;
     }
 
-    // public void setUserID(Integer userId)
-    // {
-    //     this.userId = userId;
-    // }
+    
 
     // public Integer getNumFiles()
     // {
